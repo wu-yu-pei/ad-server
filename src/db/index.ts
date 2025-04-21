@@ -1,6 +1,6 @@
 import 'dotenv/config'
 import { drizzle } from 'drizzle-orm/mysql2';
-import { categoryTable } from './schema.ts'; // 导入你的表定义
+import { categoryTable, contentTable } from './schema.ts'; // 导入你的表定义
 import mysql from 'mysql2/promise';
 
 const connection = await mysql.createConnection({
@@ -12,6 +12,7 @@ const connection = await mysql.createConnection({
 export const db = drizzle(connection, {
   schema: {
     categoryTable,
+    contentTable
   },
   mode: 'default'
 });

@@ -1,7 +1,7 @@
 import type { Request as Rq, Response as Rs } from "express";
 import db from "../db/index.ts";
-import { like } from "drizzle-orm";
-import { categoryTable } from "../db/schema.ts";
+import { and, eq, like, or } from "drizzle-orm";
+import { categoryTable, contentTable } from "../db/schema.ts";
 
 export default function (app: any) {
   // hi
@@ -15,19 +15,27 @@ export default function (app: any) {
 
     // 模糊搜索name
     const result = await db.query.categoryTable.findMany({
-      where: like(categoryTable.name, `%${keyword}%`)
+      where: or(like(categoryTable.name, `%${keyword}%`), like(categoryTable.desc, `%${keyword}%`))
     })
 
     res.send(result);
   })
 
   // 搜索内容
-  app.get('/content', (req: Rq, res: Rs) => {
-    const categoryId = req.query.categoryId;
+  app.get('/content', async (req: Rq, res: Rs) => {
+    const categoryId: number = Number(req.query.categoryId);
     const keyword = req.query.keyword;
-    res.send({
-      categoryId,
-      keyword
+
+    const result = await db.query.contentTable.findMany({
+      where: and(
+        eq(contentTable.categoryId, categoryId as number),
+        or(
+          like(contentTable.name, `%${keyword}%`),
+          like(contentTable.desc, `%${keyword}%`)
+        )
+      )
     });
+
+    res.send(result);
   })
 }

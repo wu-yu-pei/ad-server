@@ -11,3 +11,13 @@ export const categoryTable = mysqlTable('category', {
   updatedAt: int('updated_at').notNull().default(0), // 使用 int 替代 serial
 });
 
+export const contentTable = mysqlTable('content', {
+  id: int().autoincrement().primaryKey(),
+  name: varchar({ length: 255 }).notNull(), // 名称
+  desc: varchar({ length: 255 }).notNull(), // 描述
+  image: varchar({ length: 512 }).notNull(), // 图片
+  viewCount: int().notNull().default(0), // 浏览量
+  categoryId: int().notNull(),
+  createdAt: int('created_at').notNull().default(0),  // 使用 int 替代 serial
+  updatedAt: int('updated_at').notNull().default(0) // 使用 int 替代 serial
+});
