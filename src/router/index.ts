@@ -10,7 +10,7 @@ export default function (app: any) {
   });
 
   // 搜索分类
-  app.get('/categories/one-level', async (req: Rq, res: Rs) => {
+  app.get('/categories', async (req: Rq, res: Rs) => {
     const keyword = req.query.keyword;
 
     // 模糊搜索name
@@ -21,8 +21,13 @@ export default function (app: any) {
     res.send(result);
   })
 
-  // 搜索内容分类
-  app.get('/categories/one-level', (req: Rq, res: Rs) => {
-    res.send('搜索二分类');
+  // 搜索内容
+  app.get('/content', (req: Rq, res: Rs) => {
+    const categoryId = req.query.categoryId;
+    const keyword = req.query.keyword;
+    res.send({
+      categoryId,
+      keyword
+    });
   })
 }
