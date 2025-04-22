@@ -28,7 +28,7 @@ export default function (app: any) {
 
     const result = await db.query.contentTable.findMany({
       where: and(
-        eq(contentTable.categoryId, categoryId as number),
+        eq(contentTable.categoryId, categoryId),
         or(
           like(contentTable.name, `%${keyword}%`),
           like(contentTable.desc, `%${keyword}%`)
