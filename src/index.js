@@ -1,7 +1,7 @@
 import express from 'express';
-import useMiddleware from './middleware/index.ts';
+import useMiddleware from './middleware/index.js';
 import useRouter from './router/index.ts';
-import './db/index.ts';
+import './db/index.js';
 
 const app = express();
 

@@ -1,75 +1,48 @@
-import type { Request as Rq, Response as Rs } from "express";
-import db from "../db/index.ts";
-import { and, eq, like, or } from "drizzle-orm";
-import { categoryTable, contentTable } from "../db/schema.ts";
+import connect from '../db/index.js'
 
 export default function (app: any) {
   // hi
-  app.get('/', (req: Rq, res: Rs) => {
+  app.get('/', (req, res) => {
     res.send('hi!');
   });
 
   // 搜索分类
-  app.get('/categories/list', async (req: Rq, res: Rs) => {
+  app.get('/categories/list', async (req, res) => {
     const keyword = req.query.keyword;
 
-    // 模糊搜索name
-    const result = await db.query.categoryTable.findMany({
-      where: or(like(categoryTable.name, `%${keyword}%`), like(categoryTable.desc, `%${keyword}%`))
-    })
+    const [result] = await connect.query(`SELECT * FROM 'category' WHERE 'name' LIKE '%${keyword}%' OR 'desc' LIKE '%${keyword}%' LIMIT 0,1000`)
 
     res.send(result);
   })
 
   // 分类浏览量+1
-  app.get('/categories/view/:id', async (req: Rq, res: Rs) => {
+  app.get('/categories/view/:id', async (req, res) => {
     const id = Number(req.params.id);
 
-    const result = await db.query.categoryTable.findFirst({
-      where: eq(categoryTable.id, id)
-    })
-
-    if (result) {
-      await db.update(categoryTable).set({
-        viewCount: result.viewCount + 1
-      }).where(eq(categoryTable.id, id))
-    }
+    await connect.query(`UPDATE 'category' SET 'viewCount' = viewCount + 1 WHERE id = ${id}`)
 
     res.send(null);
   })
 
 
   // 搜索内容
-  app.get('/content', async (req: Rq, res: Rs) => {
+  app.get('/content', async (req, res) => {
     const categoryId: number = Number(req.query.categoryId);
     const keyword = req.query.keyword;
 
-    const result = await db.query.contentTable.findMany({
-      where: and(
-        eq(contentTable.categoryId, categoryId),
-        or(
-          like(contentTable.name, `%${keyword}%`),
-          like(contentTable.desc, `%${keyword}%`)
-        )
-      )
-    });
+    const [result] = await connect.query(`SELECT * FROM content WHERE 'categoryId' = ${categoryId} AND 'name' LIKE '%${keyword}%' OR 'desc' LIKE '%${keyword}%' LIMIT 0,1000`)
 
     res.send(result);
   })
 
   // 查询详细内容
-  app.get('/content/:id', async (req: Rq, res: Rs) => {
+  app.get('/content/:id', async (req, res) => {
     const contentId: number = Number(req.params.id);
 
-    const result = await db.query.contentTable.findFirst({
-      where: eq(contentTable.id, contentId)
-    })
+    const result = await connect.query(`SELECT * FROM content WHERE 'id' = ${contentId}`)
 
-    if (result) {
-      db.update(contentTable).set({
-        viewCount: result.viewCount + 1
-      }).where(eq(contentTable.id, contentId))
-    }
+    // 阅读数量+1
+    await connect.query(`UPDATE content SET 'viewCount' = viewCount + 1 WHERE 'id' = ${contentId}`)
 
     res.send(result);
   })

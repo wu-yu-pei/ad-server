@@ -1,7 +1,6 @@
 import express from 'express';
-import type { Application } from 'express';
 
-export default function (app: Application) {
+export default function (app) {
   // middleware
   app.use(express.json());
   // static
