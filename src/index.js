@@ -1,6 +1,6 @@
 import express from 'express';
 import useMiddleware from './middleware/index.js';
-import useRouter from './router/index.ts';
+import useRouter from './router/index.js';
 import './db/index.js';
 
 const app = express();
